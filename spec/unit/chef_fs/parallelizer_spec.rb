@@ -29,7 +29,7 @@ describe Chef::ChefFS::Parallelizer do
         sleep val
         outputs << val
       end
-      expect(elapsed_time).to be < 0.6
+      expect(elapsed_time).to be < 0.7
       expect(outputs).to eq([ 0.1, 0.3, 0.5 ])
     end
 
@@ -68,7 +68,7 @@ describe Chef::ChefFS::Parallelizer do
         results = []
         expect { enum.each { |value| results << value } }.to raise_error "hi"
         expect(results).to eq([ 0.1, 0.3, 0.5 ])
-        expect(elapsed_time).to be < 0.6
+        expect(elapsed_time).to be < 0.7
       end
 
       it "Exceptions in output are raised after all processing is done" do
@@ -118,7 +118,7 @@ describe Chef::ChefFS::Parallelizer do
           sleep 0.2
           "x"
         end.to_a).to eq(%w{x x x x x x x x x x})
-        expect(elapsed_time).to be < 0.6
+        expect(elapsed_time).to be < 0.7
       end
 
       it "Output comes in the order of the input" do
@@ -139,7 +139,7 @@ describe Chef::ChefFS::Parallelizer do
         results = []
         enum = parallelize(input) { |x| sleep(x); x }
         expect { enum.each { |value| results << value } }.to raise_error "hi"
-        expect(elapsed_time).to be < 0.7
+        expect(elapsed_time).to be < 0.8
         expect(results).to eq([ 0.5, 0.3, 0.1 ])
       end
 
