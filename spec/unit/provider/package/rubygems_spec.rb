@@ -387,8 +387,9 @@ describe Chef::Provider::Package::Rubygems do
   before(:each) do
     # We choose detect omnibus via RbConfig::CONFIG['bindir'] in Chef::Provider::Package::Rubygems.new
     allow(RbConfig::CONFIG).to receive(:[]).with("bindir").and_return(bindir)
-    # Rubygems uses this interally
+    # Rubygems uses these two interally
     allow(RbConfig::CONFIG).to receive(:[]).with("arch").and_call_original
+    allow(RbConfig::CONFIG).to receive(:[]).with("ruby_install_name").and_call_original
     allow(File).to receive(:executable?).and_return false
     allow(File).to receive(:executable?).with("#{bindir}/gem").and_return true
     # XXX: we can't stub the provider object directly here because referencing it will create it and that
