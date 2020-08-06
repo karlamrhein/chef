@@ -1,6 +1,9 @@
 # Stop script execution when a non-terminating error occurs
 $ErrorActionPreference = "Stop"
 
+# install chocolatey
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
 $channel = "$Env:CHANNEL"
 If ([string]::IsNullOrEmpty($channel)) { $channel = "unstable" }
 
@@ -90,9 +93,6 @@ winrm quickconfig -quiet
 
 bundle
 If ($lastexitcode -ne 0) { Exit $lastexitcode }
-
-# install chocolatey
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
 bundle exec rspec -r rspec_junit_formatter -f RspecJunitFormatter -o test.xml -f progress
 If ($lastexitcode -ne 0) { Exit $lastexitcode }
