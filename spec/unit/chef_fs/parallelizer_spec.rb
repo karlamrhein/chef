@@ -157,7 +157,7 @@ describe Chef::ChefFS::Parallelizer do
         results = []
         expect { enum.each { |value| results << value } }.to raise_error "hi"
         expect(results).to eq([ 1, 2 ])
-        expect(elapsed_time).to be < 0.3
+        expect(elapsed_time).to be < 0.4
         expect(processed).to eq(3)
       end
 
@@ -188,7 +188,7 @@ describe Chef::ChefFS::Parallelizer do
       end
       enum = parallelize(input) { |x| x }
       expect(enum.map do |value|
-        expect(elapsed_time).to be < (value + 2) * 0.1
+        expect(elapsed_time).to be < (value + 3) * 0.1
         value
       end).to eq([ 1, 2, 3 ])
     end
@@ -223,7 +223,7 @@ describe Chef::ChefFS::Parallelizer do
           sleep(0.1)
           x
         end.to_a).to eq([ 1 ])
-        expect(elapsed_time).to be < 0.3
+        expect(elapsed_time).to be < 0.4
       end
 
       it "parallelize with :main_thread_processing = false waits for the job to finish" do
