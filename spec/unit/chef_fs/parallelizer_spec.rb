@@ -1,7 +1,11 @@
 require "spec_helper"
 require "chef/chef_fs/parallelizer"
 
-describe Chef::ChefFS::Parallelizer do
+# FIXME: these are disabled on MacOS due to timing issues in our anka build cluster
+# these issues should be fixed and the tests should be re-eenabled.  If we are getting
+# omnibus test phases on mac tests which are reasonable and not ~3 hours long, then the
+# condition to avoid this testing on macs can be deleted
+describe Chef::ChefFS::Parallelizer, :not_supported_on_macos do
   before :each do
     @start_time = Time.now
   end
@@ -29,7 +33,7 @@ describe Chef::ChefFS::Parallelizer do
         sleep val
         outputs << val
       end
-      expect(elapsed_time).to be < 0.7
+      expect(elapsed_time).to be < 0.6
       expect(outputs).to eq([ 0.1, 0.3, 0.5 ])
     end
 
@@ -41,12 +45,12 @@ describe Chef::ChefFS::Parallelizer do
         expect(elapsed_time).to be < 0.1
       end
 
-      it "10 sleep(0.2)s complete within 0.7 seconds" do
+      it "10 sleep(0.2)s complete within 0.5 seconds" do
         expect(parallelize(1.upto(10), ordered: false) do |i|
           sleep 0.2
           "x"
         end.to_a).to eq(%w{x x x x x x x x x x})
-        expect(elapsed_time).to be < 0.7
+        expect(elapsed_time).to be < 0.5
       end
 
       it "The output comes as soon as it is available" do
@@ -55,7 +59,7 @@ describe Chef::ChefFS::Parallelizer do
           val
         end
         expect(enum.map do |value|
-          expect(elapsed_time).to be < value + 0.3
+          expect(elapsed_time).to be < value + 0.1
           value
         end).to eq([ 0.1, 0.3, 0.5 ])
       end
@@ -68,7 +72,7 @@ describe Chef::ChefFS::Parallelizer do
         results = []
         expect { enum.each { |value| results << value } }.to raise_error "hi"
         expect(results).to eq([ 0.1, 0.3, 0.5 ])
-        expect(elapsed_time).to be < 0.7
+        expect(elapsed_time).to be < 0.6
       end
 
       it "Exceptions in output are raised after all processing is done" do
@@ -85,7 +89,7 @@ describe Chef::ChefFS::Parallelizer do
         results = []
         expect { enum.each { |value| results << value } }.to raise_error "hi"
         expect(results.sort).to eq([ 1, 2, 3 ])
-        expect(elapsed_time).to be < 0.4
+        expect(elapsed_time).to be < 0.3
         expect(processed).to eq(3)
       end
 
@@ -118,7 +122,7 @@ describe Chef::ChefFS::Parallelizer do
           sleep 0.2
           "x"
         end.to_a).to eq(%w{x x x x x x x x x x})
-        expect(elapsed_time).to be < 0.7
+        expect(elapsed_time).to be < 0.5
       end
 
       it "Output comes in the order of the input" do
@@ -129,7 +133,7 @@ describe Chef::ChefFS::Parallelizer do
         expect(enum.next).to eq([ 0.5, 0 ])
         expect(enum.next).to eq([ 0.3, 1 ])
         expect(enum.next).to eq([ 0.1, 2 ])
-        expect(elapsed_time).to be < 0.7
+        expect(elapsed_time).to be < 0.6
       end
 
       it "Exceptions in input are raised in the correct sequence but do NOT stop processing" do
@@ -139,7 +143,7 @@ describe Chef::ChefFS::Parallelizer do
         results = []
         enum = parallelize(input) { |x| sleep(x); x }
         expect { enum.each { |value| results << value } }.to raise_error "hi"
-        expect(elapsed_time).to be < 0.8
+        expect(elapsed_time).to be < 0.6
         expect(results).to eq([ 0.5, 0.3, 0.1 ])
       end
 
@@ -157,7 +161,7 @@ describe Chef::ChefFS::Parallelizer do
         results = []
         expect { enum.each { |value| results << value } }.to raise_error "hi"
         expect(results).to eq([ 1, 2 ])
-        expect(elapsed_time).to be < 0.4
+        expect(elapsed_time).to be < 0.3
         expect(processed).to eq(3)
       end
 
@@ -188,7 +192,7 @@ describe Chef::ChefFS::Parallelizer do
       end
       enum = parallelize(input) { |x| x }
       expect(enum.map do |value|
-        expect(elapsed_time).to be < (value + 3) * 0.1
+        expect(elapsed_time).to be < (value + 1) * 0.1
         value
       end).to eq([ 1, 2, 3 ])
     end
@@ -223,7 +227,7 @@ describe Chef::ChefFS::Parallelizer do
           sleep(0.1)
           x
         end.to_a).to eq([ 1 ])
-        expect(elapsed_time).to be < 0.4
+        expect(elapsed_time).to be < 0.2
       end
 
       it "parallelize with :main_thread_processing = false waits for the job to finish" do
