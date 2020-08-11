@@ -11,7 +11,7 @@ Security/Eval:
 Lint/UselessAssignment:
   Enabled: false
 Lint/DeprecatedClassMethods:
-  Enabled: false
+  Enabled: true
 Lint/ParenthesesAsGroupedExpression:
   Enabled: false
 Lint/AmbiguousRegexpLiteral:
