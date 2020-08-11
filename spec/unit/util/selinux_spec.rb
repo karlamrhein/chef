@@ -31,6 +31,7 @@ describe Chef::Util::Selinux do
 
   before do
     allow(ChefUtils).to receive(:windows?).and_return(false)
+    allow(ENV).to receive(:[]).with("PATHEXT").and_return(nil)
     TestClass.reset_state
     @test_instance = TestClass.new
   end
